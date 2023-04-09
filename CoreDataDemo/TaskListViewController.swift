@@ -11,17 +11,25 @@ import CoreData
 
 class TaskListViewController: UITableViewController {
     
-   
+    private var taskList: [Task] = []
     private let cellID = "task"
-    var taskList = StorageManager.shared.taskList
+    
+    
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        StorageManager.shared.fetchData { taskList in
+            self.taskList = taskList
+        }
+        
         view.backgroundColor = .white
         setupNavigationBar()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
         StorageManager.shared.saveContext()
-        StorageManager.shared.fetchData()
+        StorageManager.shared.fetchData { taskList in
+            self.taskList = taskList
+        }
         
     }
 
@@ -60,11 +68,15 @@ class TaskListViewController: UITableViewController {
     
     private func showAlert(with title: String, and message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+
         let saveAction = UIAlertAction(title: "Save", style: .default) { [unowned self]_ in
             guard let task = alert.textFields?.first?.text, !task.isEmpty else { return }
+            StorageManager.shared.save(task) { taskList in
+                self.taskList = taskList
             let cellIndex = IndexPath(row: taskList.count - 1, section: 0)
             tableView.insertRows(at: [cellIndex], with: .automatic)
-            StorageManager.shared.save(task)
+            
+            }
             
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
@@ -87,11 +99,22 @@ extension TaskListViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
-        let task = StorageManager.shared.taskList[indexPath.row]
+        let task = taskList[indexPath.row]
         var content = cell.defaultContentConfiguration()
         content.text = task.title
         cell.contentConfiguration = content
         return cell
     }
-}
+    
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            taskList.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+    }
+    }
+
+
+
 

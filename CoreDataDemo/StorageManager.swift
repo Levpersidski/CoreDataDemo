@@ -13,11 +13,8 @@ class StorageManager {
     private init() {}
     
     
-    var taskList: [Task] = []
-    
-    
     // MARK: - Core Data stack
-   lazy var persistentContainer: NSPersistentContainer = {
+    var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CoreDataDemo")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -30,15 +27,19 @@ class StorageManager {
    lazy var viewContext = persistentContainer.viewContext
     
     
-     func fetchData() {
+    func fetchData(completion:([Task]) -> Void) {
         let fetchRequest = Task.fetchRequest()
         
         do {
-            taskList = try viewContext.fetch(fetchRequest)
+           let taskList = try viewContext.fetch(fetchRequest)
+            completion(taskList)
         } catch let error {
             print(error.localizedDescription)
         }
     }
+    
+    
+    
     
 
     // MARK: - Core Data Saving support
@@ -54,10 +55,12 @@ class StorageManager {
         }
     }
     
-     func save(_ taskName: String) {
+     func save(_ taskName: String, completion:([Task]) -> Void) {
         let task = Task(context: viewContext)
         task.title = taskName
-        taskList.append(task)
+         var taskList: [Task] = []
+         taskList.append(task)
+         completion(taskList)
        
         if viewContext.hasChanges {
             do {
@@ -67,5 +70,6 @@ class StorageManager {
             }
         }
     }
+    
     
 }
