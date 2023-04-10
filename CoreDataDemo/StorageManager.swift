@@ -7,6 +7,8 @@
 
 import Foundation
 import CoreData
+import UIKit
+
 class StorageManager {
     static let shared = StorageManager()
 
@@ -56,8 +58,8 @@ class StorageManager {
     }
     
      func save(_ taskName: String, completion:([Task]) -> Void) {
-        let task = Task(context: viewContext)
-        task.title = taskName
+        let task = Task(context: viewContext) // создается обьект задачи на основе контекста
+        task.title = taskName // передаем в тайтл значение из параметра 
          var taskList: [Task] = []
          taskList.append(task)
          completion(taskList)
@@ -71,5 +73,17 @@ class StorageManager {
         }
     }
     
+    func deleteCell (for row: Int) {
+        
+        func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+            if editingStyle == .delete {
+                let task = Task(context: viewContext)
+                 var taskList: [Task] = []
+                taskList.remove(at: row)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+                
+            }
+        }
+    }
     
 }

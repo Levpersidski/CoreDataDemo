@@ -72,7 +72,7 @@ class TaskListViewController: UITableViewController {
         let saveAction = UIAlertAction(title: "Save", style: .default) { [unowned self]_ in
             guard let task = alert.textFields?.first?.text, !task.isEmpty else { return }
             StorageManager.shared.save(task) { taskList in
-                self.taskList = taskList
+                self.taskList.append(task)
             let cellIndex = IndexPath(row: taskList.count - 1, section: 0)
             tableView.insertRows(at: [cellIndex], with: .automatic)
             
@@ -107,13 +107,8 @@ extension TaskListViewController {
     }
     
     
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            taskList.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
+   
         }
-    }
-    }
 
 
 
