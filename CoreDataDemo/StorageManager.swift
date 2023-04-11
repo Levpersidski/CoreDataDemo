@@ -7,11 +7,10 @@
 
 import Foundation
 import CoreData
-import UIKit
 
 class StorageManager {
     static let shared = StorageManager()
-
+    
     private init() {}
     
     
@@ -26,14 +25,14 @@ class StorageManager {
         return container
     }()
     
-   lazy var viewContext = persistentContainer.viewContext
+    lazy var viewContext = persistentContainer.viewContext
     
     
     func fetchData(completion:([Task]) -> Void) {
         let fetchRequest = Task.fetchRequest()
         
         do {
-           let taskList = try viewContext.fetch(fetchRequest)
+            let taskList = try viewContext.fetch(fetchRequest)
             completion(taskList)
         } catch let error {
             print(error.localizedDescription)
@@ -43,7 +42,7 @@ class StorageManager {
     
     
     
-
+    
     // MARK: - Core Data Saving support
     func saveContext() {
         let context = persistentContainer.viewContext
@@ -57,33 +56,24 @@ class StorageManager {
         }
     }
     
-     func save(_ taskName: String, completion:([Task]) -> Void) {
+    func save(_ taskName: String, completion:(Task) -> Void) {
         let task = Task(context: viewContext) // создается обьект задачи на основе контекста
-        task.title = taskName // передаем в тайтл значение из параметра 
-         var taskList: [Task] = []
-         taskList.append(task)
-         completion(taskList)
-       
-        if viewContext.hasChanges {
-            do {
-                try viewContext.save()
-            } catch let error {
-                print(error)
-            }
-        }
+        task.title = taskName // передаем в тайтл значение из параметра
+        completion(task)
+        
+        saveContext()
+        
     }
     
-    func deleteCell (for row: Int) {
+    func delete (for task: Task) {
+        viewContext.delete(task)
+        saveContext()
+    }
+    
+    func edit (for task: Task, newTitle: String) {
+        task.title = newTitle
+        saveContext()
         
-        func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-            if editingStyle == .delete {
-                let task = Task(context: viewContext)
-                 var taskList: [Task] = []
-                taskList.remove(at: row)
-                tableView.deleteRows(at: [indexPath], with: .automatic)
-                
-            }
-        }
     }
     
 }
