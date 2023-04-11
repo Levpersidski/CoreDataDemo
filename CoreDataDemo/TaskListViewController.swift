@@ -76,6 +76,7 @@ class TaskListViewController: UITableViewController {
                 let cellIndex = IndexPath(row: taskList.count - 1, section: 0)
                 tableView.insertRows(at: [cellIndex], with: .automatic)
                 
+                
             }
             
         }
@@ -103,6 +104,13 @@ extension TaskListViewController {
         var content = cell.defaultContentConfiguration()
         content.text = task.title
         cell.contentConfiguration = content
+
+        cell.layer.borderWidth = 1
+        cell.layer.cornerRadius = 10
+        cell.layer.borderColor = UIColor(named:"blueClouds")?.cgColor
+        tableView.rowHeight = UITableView.automaticDimension
+      
+
         return cell
     }
     
@@ -136,6 +144,7 @@ extension TaskListViewController {
         // отображаю аллерт
         present(alertController, animated: true, completion: nil)
     }
+    
 }
 
 
