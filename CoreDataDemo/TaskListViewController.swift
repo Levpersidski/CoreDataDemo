@@ -13,19 +13,16 @@ class TaskListViewController: UITableViewController {
     
     private var taskList: [Task] = []
     private let cellID = "task"
-    
-    
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         StorageManager.shared.fetchData { taskList in
             self.taskList = taskList
         }
-        
         view.backgroundColor = .white
         setupNavigationBar()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
+        
         StorageManager.shared.saveContext()
         StorageManager.shared.fetchData { taskList in
             self.taskList = taskList
