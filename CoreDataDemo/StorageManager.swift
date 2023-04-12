@@ -13,7 +13,6 @@ class StorageManager {
     
     private init() {}
     
-    
     // MARK: - Core Data stack
     var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CoreDataDemo")
@@ -38,10 +37,6 @@ class StorageManager {
             print(error.localizedDescription)
         }
     }
-    
-    
-    
-    
     
     // MARK: - Core Data Saving support
     func saveContext() {

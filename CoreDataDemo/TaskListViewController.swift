@@ -13,7 +13,7 @@ class TaskListViewController: UITableViewController {
     
     private var taskList: [Task] = []
     private let cellID = "task"
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         StorageManager.shared.fetchData { taskList in
@@ -86,6 +86,28 @@ class TaskListViewController: UITableViewController {
         present(alert, animated: true)
     }
     
+    private func showEditAlert(task: Task, completion: @escaping() -> ()) {
+        
+        let alertController = UIAlertController(title: "Edit task", message: "What do you want to do?", preferredStyle: .alert)
+        
+        alertController.addTextField { textField in
+            textField.text = task.title
+        }
+        
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "Save", style: .default, handler: { _ in
+            
+            guard let newTitle = alertController.textFields?.first?.text else { return }
+            
+            StorageManager.shared.edit(for: task, newTitle: newTitle)
+            
+            completion()
+        }))
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    
     
 }
 
@@ -101,13 +123,12 @@ extension TaskListViewController {
         var content = cell.defaultContentConfiguration()
         content.text = task.title
         cell.contentConfiguration = content
-
+        
         cell.layer.borderWidth = 1
         cell.layer.cornerRadius = 10
         cell.layer.borderColor = UIColor(named:"blueClouds")?.cgColor
         tableView.rowHeight = UITableView.automaticDimension
-      
-
+        
         return cell
     }
     
@@ -120,31 +141,13 @@ extension TaskListViewController {
         }
     }
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // получаю выбранную по тапу задачу
-        let task = taskList[indexPath.row]
-        // Создаем аллерт контроллер
-        let alertController = UIAlertController(title: "Edit task", message: "What do you want to do?", preferredStyle: .alert)
-        // Добавляю текстовое поле в аллерт , содержащее название задачи
-        alertController.addTextField { textField in
-            textField.text = task.title
-        }
-        // Добавляем кнопку "Cancel" и "Save" в аллерт контроллера
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        alertController.addAction(UIAlertAction(title: "Save", style: .default, handler: { _ in
-            // Получаем новое значение названия задачи из текстового поля
-            guard let newTitle = alertController.textFields?.first?.text else { return }
-            // вызываю метод редактирования
-            StorageManager.shared.edit(for: task, newTitle: newTitle)
-            // перезагружаю данные в ячейке
+        var task = taskList[indexPath.row]
+        showEditAlert(task: task) {
             self.tableView.reloadRows(at: [indexPath], with: .automatic)
-        }))
-        // отображаю аллерт
-        present(alertController, animated: true, completion: nil)
+        }
     }
     
+    
+    
+    
 }
-
-
-
-
-
